@@ -23,15 +23,19 @@ const Auth = ({ onAuth }) => {
   };
 
   const handleLogin = (e) => {
-    e.preventDefault();
-    const saved = JSON.parse(localStorage.getItem("user"));
-    if (saved && saved.name === authForm.name && saved.password === authForm.password) {
-      onAuth(saved);
-      setAuthError("");
-    } else {
-      setAuthError("Invalid credentials");
-    }
-  };
+  e.preventDefault();
+  const saved = JSON.parse(localStorage.getItem("user"));
+  if (
+    saved &&
+    saved.name === authForm.name.trim() &&
+    saved.password === authForm.password
+  ) {
+    onAuth(saved);
+    setAuthError("");
+  } else {
+    setAuthError("Invalid credentials");
+  }
+};
 
   return (
       <Container fixed align="center" maxWidth="xl" >

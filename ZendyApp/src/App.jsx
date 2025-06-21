@@ -41,7 +41,6 @@ const App = () => {
   });
   const handleLogout = () => {
   setUser(null);
-  localStorage.removeItem('user');
 };
 
   // State

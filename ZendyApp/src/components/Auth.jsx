@@ -1,11 +1,14 @@
 import React, { useState } from "react";
-import { Box, Container, TextField, Button, Typography, Alert, Stack } from "@mui/material";
-import { FaUser, FaLock } from "react-icons/fa";
+import { Box, Container, TextField, Button, Typography, Alert, Stack, IconButton, InputAdornment } from "@mui/material";
+import { FaUser } from "react-icons/fa";
+import Visibility from "@mui/icons-material/Visibility";
+import VisibilityOff from "@mui/icons-material/VisibilityOff";
 
 const Auth = ({ onAuth }) => {
   const [authMode, setAuthMode] = useState("login");
   const [authForm, setAuthForm] = useState({ name: "", password: "" });
   const [authError, setAuthError] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
 
   const handleAuthChange = (e) => {
     setAuthForm({ ...authForm, [e.target.name]: e.target.value });
@@ -76,12 +79,22 @@ const Auth = ({ onAuth }) => {
             <TextField
               label="Password"
               name="password"
-              type="password"
+              type={showPassword ? "text" : "password"}
               value={authForm.password}
               onChange={handleAuthChange}
               fullWidth
               InputProps={{
-                startAdornment: <FaLock style={{ marginRight: 8 }} />,
+                endAdornment: (
+                  <InputAdornment position="end">
+                    <IconButton
+                      aria-label={showPassword ? "Hide password" : "Show password"}
+                      onClick={() => setShowPassword((show) => !show)}
+                      edge="end"
+                    >
+                      {showPassword ? <VisibilityOff /> : <Visibility />}
+                    </IconButton>
+                  </InputAdornment>
+                ),
               }}
             />
             <Button

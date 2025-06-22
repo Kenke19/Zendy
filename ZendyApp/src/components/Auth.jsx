@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import {Box, Container} from "@mui/material";
+import { Box, Container, TextField, Button, Typography, Alert, Stack } from "@mui/material";
 import { FaUser, FaLock } from "react-icons/fa";
 
 const Auth = ({ onAuth }) => {
@@ -17,58 +17,99 @@ const Auth = ({ onAuth }) => {
       setAuthError("Please fill all fields");
       return;
     }
+    const users = JSON.parse(localStorage.getItem("users")) || {};
+    if (users[authForm.name]) {
+      setAuthError("User already exists");
+      return;
+    }
+    users[authForm.name] = { ...authForm };
+    localStorage.setItem("users", JSON.stringify(users));
     localStorage.setItem("user", JSON.stringify(authForm));
     onAuth(authForm);
     setAuthError("");
   };
 
   const handleLogin = (e) => {
-  e.preventDefault();
-  const saved = JSON.parse(localStorage.getItem("user"));
-  if (
-    saved &&
-    saved.name === authForm.name.trim() &&
-    saved.password === authForm.password
-  ) {
-    onAuth(saved);
-    setAuthError("");
-  } else {
-    setAuthError("Invalid credentials");
-  }
-};
+    e.preventDefault();
+    const users = JSON.parse(localStorage.getItem("users")) || {};
+    const saved = users[authForm.name.trim()];
+    if (
+      saved &&
+      saved.name === authForm.name.trim() &&
+      saved.password === authForm.password
+    ) {
+      localStorage.setItem("user", JSON.stringify(saved));
+      onAuth(saved);
+      setAuthError("");
+    } else {
+      setAuthError("Invalid credentials");
+    }
+  };
 
   return (
-      <Container fixed align="center" maxWidth="xl" >
-      <Box component="div" sx={{ width: "100%", maxWidth: 400, height: "100%", margin: "auto", padding: 5, borderRadius: 2, boxShadow: 3,  }}>
-      <form onSubmit={authMode === "login" ? handleLogin : handleRegister}>
-        <h2>{authMode === "login" ? "Login" : "Register"}</h2>
-        {authError && <div>{authError}</div>}
-        <input
-          type="text"
-          name="name"
-          placeholder="Name"
-          value={authForm.name}
-          onChange={handleAuthChange}
-        />
-        <input
-          type="password"
-          name="password"
-          placeholder="Password"
-          value={authForm.password}
-          onChange={handleAuthChange}
-        />
-        <button type="submit">
-          {authMode === "login" ? "Login" : "Register"}
-        </button>
-        <button
-          type="button"
-          onClick={() => setAuthMode(authMode === "login" ? "register" : "login")}
-        >
-          {authMode === "login" ? "No account? Register" : "Have an account? Login"}
-        </button>
-      </form>
+    <Container maxWidth="sm" sx={{ minHeight: "100vh", display: "flex", alignItems: "center" }}>
+      <Box
+        sx={{
+          width: "100%",
+          p: 4,
+          borderRadius: 3,
+          boxShadow: 4,
+          bgcolor: "background.paper",
+        }}
+      >
+        <form onSubmit={authMode === "login" ? handleLogin : handleRegister}>
+          <Stack spacing={3}>
+            <Typography variant="h5" align="center" fontWeight={600}>
+              {authMode === "login" ? "Login" : "Register"}
+            </Typography>
+            {authError && <Alert severity="error">{authError}</Alert>}
+            <TextField
+              label="Name"
+              name="name"
+              value={authForm.name}
+              onChange={handleAuthChange}
+              fullWidth
+              InputProps={{
+                startAdornment: <FaUser style={{ marginRight: 8 }} />,
+              }}
+            />
+            <TextField
+              label="Password"
+              name="password"
+              type="password"
+              value={authForm.password}
+              onChange={handleAuthChange}
+              fullWidth
+              InputProps={{
+                startAdornment: <FaLock style={{ marginRight: 8 }} />,
+              }}
+            />
+            <Button
+              type="submit"
+              variant="contained"
+              color="primary"
+              fullWidth
+              size="large"
+            >
+              {authMode === "login" ? "Login" : "Register"}
+            </Button>
+            <Button
+              type="button"
+              variant="text"
+              color="secondary"
+              fullWidth
+              onClick={() =>
+                setAuthMode(authMode === "login" ? "register" : "login")
+              }
+            >
+              {authMode === "login"
+                ? "No account? Register"
+                : "Have an account? Login"}
+            </Button>
+          </Stack>
+        </form>
       </Box>
-      </Container>
+    </Container>
   );
 };
 

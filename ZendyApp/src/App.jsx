@@ -33,21 +33,17 @@ const getTagClass = (type) => {
       return 'bg-gray-100 text-gray-700';
   }
 };
+
 const App = () => {
   // Auth state
   const [user, setUser] = useState(() => {
     const saved = localStorage.getItem('user');
     return saved ? JSON.parse(saved) : null;
   });
-  const handleLogout = () => {
-  setUser(null);
-};
 
   // State
-  const [tasks, setTasks] = useState(() => {
-    const savedTasks = localStorage.getItem('tasks');
-    return savedTasks ? JSON.parse(savedTasks) : [];
-  });
+  const [tasks, setTasks] = useState([]);
+  const [tasksLoaded, setTasksLoaded] = useState(false);
   const [taskInput, setTaskInput] = useState('');
   const [taskType, setTaskType] = useState('study');
   const [quote, setQuote] = useState({ text: 'Loading motivational quote...', author: '- Author' });
@@ -63,7 +59,16 @@ const App = () => {
   const [editingText, setEditingText] = useState('');
   const draggedItemRef = useRef(null);
 
-  
+  // Logout handler
+  const handleLogout = () => {
+    setUser(null);
+    setTasks([]);
+  };
+
+  useEffect(() => {
+    setTasksLoaded(false);
+  }, [user]);
+
   // Derived state
   const completedTasks = tasks.filter(task => task.completed).length;
   const completionPercentage = tasks.length > 0 ? (completedTasks / tasks.length) * 100 : 0;
@@ -74,16 +79,34 @@ const App = () => {
     return () => clearInterval(timer);
   }, []);
 
+  // Load tasks for logged-in user
   useEffect(() => {
-    localStorage.setItem('tasks', JSON.stringify(tasks));
-  }, [tasks]);
+  if (user && user.name) {
+    const key = `tasks_${user.name}`;
+    const savedTasks = localStorage.getItem(key);
+    console.log("Loading tasks for", key, ":", savedTasks);
+    setTasks(savedTasks ? JSON.parse(savedTasks) : []);
+    setTasksLoaded(true);
+  }
+}, [user]);
+
+  // Save tasks for logged-in user
+  useEffect(() => {
+  if (user && user.name && tasksLoaded) {
+    const key = `tasks_${user.name}`;
+    console.log("Saving tasks for", key, ":", tasks);
+    localStorage.setItem(key, JSON.stringify(tasks));
+  }
+}, [tasks, user, tasksLoaded]);
 
   useEffect(() => {
     fetchMotivationalQuote();
     getWeather();
     // eslint-disable-next-line
   }, []);
+
   const capitalizeFirstLetter = (str) => str.charAt(0).toUpperCase() + str.slice(1);
+
   // Task handlers
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -195,9 +218,11 @@ const App = () => {
 
   // Sort tasks by creation date (latest first)
   const sortedTasks = [...tasks].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+
   if (!user) {
     return <Auth onAuth={setUser} />;
   }
+
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="container mx-auto px-4 py-8 max-w-6xl">

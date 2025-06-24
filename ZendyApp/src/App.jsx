@@ -161,6 +161,36 @@ const App = () => {
     setEditingTaskId(null);
     setEditingText('');
   };
+  //DRAG AND DROP FEATURE 
+  const handleDragStart = (e, taskId) => {
+  draggedItemRef.current = taskId;
+};
+
+const handleDragOver = (e) => {
+  e.preventDefault();
+};
+
+const handleDrop = (e, targetTaskId) => {
+  const draggedId = draggedItemRef.current;
+  if (draggedId === targetTaskId) return;
+
+  const draggedIndex = tasks.findIndex(task => task.id === draggedId);
+  const targetIndex = tasks.findIndex(task => task.id === targetTaskId);
+
+  if (draggedIndex === -1 || targetIndex === -1) return;
+
+  const updatedTasks = [...tasks];
+  const [draggedTask] = updatedTasks.splice(draggedIndex, 1);
+  updatedTasks.splice(targetIndex, 0, draggedTask);
+
+  setTasks(updatedTasks);
+  draggedItemRef.current = null;
+};
+
+const handleDragEnd = () => {
+  draggedItemRef.current = null;
+};
+
 
   // Motivational quote
   const fetchMotivationalQuote = () => {
@@ -279,7 +309,7 @@ const App = () => {
             <div className="bg-white rounded-xl shadow-md overflow-hidden">
               <div className="p-6 border-b border-gray-200">
                 <h2 className="font-semibold text-gray-800 text-xl flex items-center">
-                  Today's Study Plan
+                  Today's Study plan
                 </h2>
                 <TaskForm
                   taskInput={taskInput}
@@ -289,9 +319,14 @@ const App = () => {
                   handleSubmit={handleSubmit}
                 />
               </div>
-              <div className="task-list overflow-y-auto" style={{ maxHeight: '500px' }}>
+              <div  style={{ maxHeight: '500px' }}>
                 <TaskList
-                  tasks={sortedTasks}
+                  tasks={tasks}
+                  draggedItemRef={draggedItemRef} //drag and drop feature
+                  handleDragStart={handleDragStart}
+                  handleDragOver={handleDragOver}
+                  handleDrop={handleDrop}
+                  handleDragEnd={handleDragEnd} //drag and drop feature
                   editingTaskId={editingTaskId}
                   editingText={editingText}
                   startEditing={startEditing}

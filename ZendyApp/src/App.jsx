@@ -58,6 +58,9 @@ const App = () => {
   const [editingTaskId, setEditingTaskId] = useState(null);
   const [editingText, setEditingText] = useState('');
   const draggedItemRef = useRef(null);
+  const [reminders, setReminders] = useState([]);
+  const [reminderDate, setReminderDate] = useState(null);
+  const [reminderText, setReminderText] = useState('');
 
   // Logout handler
   const handleLogout = () => {
@@ -204,20 +207,43 @@ const App = () => {
       days.push(<div key={`empty-${i}`}></div>);
     }
     for (let d = 1; d <= daysInMonth; d++) {
+      const dayDate = `${year}-${String(month + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
+      const hasReminder = reminders.some(r => r.date === dayDate);
+
       days.push(
         <div
           key={d}
-          className={`p-1 rounded-full text-center ${d === new Date().getDate() && month === new Date().getMonth() && year === new Date().getFullYear() ? 'bg-indigo-200 font-bold' : ''}`}
+          onClick={() => setReminderDate(dayDate)}
+          style={{ cursor: 'pointer', position: 'relative', minHeight: 28 }}
+          title="Set reminder"
         >
           {d}
-        </div>
+          {hasReminder && (
+            <span
+              style={{
+              display: 'block',
+              width: 6,
+              height: 6,
+              borderRadius: '50%',
+              background: '#f59e42',
+              position: 'absolute',
+              left: '50%',
+              transform: 'translateX(-50%)',
+              bottom: 4,
+            }}
+          />
+        )}
+        
+      </div>
       );
     }
     return days;
   };
 
-  // Sort tasks by creation date (latest first)
-  const sortedTasks = [...tasks].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+
+  const sortedTasks = [...tasks]
+  .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)) 
+  .sort((a, b) => a.completed - b.completed); 
 
   if (!user) {
     return <Auth onAuth={setUser} />;

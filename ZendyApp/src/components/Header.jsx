@@ -1,47 +1,111 @@
-// WeatherCard component
 import React from 'react';
-import { FaMapMarkerAlt, FaBookOpen} from 'react-icons/fa';
+import { Box, Paper, Typography, Button, Stack, Avatar } from '@mui/material';
+import { FaMapMarkerAlt, FaBookOpen } from 'react-icons/fa';
 
-
-  const Header = ({ weather, userName, handleLogout }) => (
-    <div className="weather-card rounded-lg shadow-md p-4 text-white w-full md:w-auto">
-        <div>
-          <h1 className="text-3xl font-bold text-gray-800 flex items-center">
-            <FaBookOpen className="text-indigo-600 mr-3" />
-              Zendy
-          </h1>
-          <p className="text-gray-600">Your daily study companion</p>
-          <br/>
-          <p className="text-gray-600">
-        {userName ? `Welcome, ${userName}!` : "Your daily study companion"}
-        {userName && (
-          <button
-            className="ml-4 bg-red-500 text-white px-3 py-1 rounded"
-            onClick={handleLogout}
+const Header = ({ weather, userName, handleLogout }) => (
+  <Paper
+    elevation={6}
+    sx={{
+      borderRadius: 4,
+      p: { xs: 2, md: 4, sm:3 },
+      mb: 4,
+      width: '100%',
+      background: 'linear-gradient(90deg,rgb(236, 239, 243) 0%,rgb(212, 219, 243) 100%)',
+      boxShadow: '0 8px 32px 0 rgba(31, 38, 135, 0.10)',
+      overflow: 'hidden',
+    }}
+  >
+    <Stack
+      direction={{ xs: 'column', md: 'row' }}
+      alignItems={{ xs: 'center', md: 'center' }}
+      justifyContent="space-between"
+      spacing={4}
+    >
+      {/* Branding and Welcome */}
+      <Box>
+        <Stack direction="row" alignItems="center" spacing={2}>
+          <Avatar
+            sx={{
+              bgcolor: 'primary.main',
+              width: 50,
+              height: 50,
+              boxShadow: 15,
+            }}
           >
-            Logout
-          </button>
+            <FaBookOpen size={38} />
+          </Avatar>
+          <Typography
+            variant="h4"
+            fontWeight={600}
+            color="primary.main"
+            sx={{ letterSpacing: 1.5, fontFamily: 'Roboto, sans-serif' }}
+          >
+            Zendy
+          </Typography>
+        </Stack>
+        <Typography variant="subtitle1" color="text.secondary" mb={3}>
+          Your daily study companion
+        </Typography>
+        {userName && (
+          <Stack direction="row" alignItems="center" spacing={2} mt={1}>
+            <Typography variant="overline" color="primary.dark" >
+              Welcome, <b>{userName}</b>
+            </Typography>
+            <Button
+              variant="outlined"
+              color="error"
+              size="small"
+              sx={{
+                borderRadius: 2,
+                textTransform: 'none',
+                fontWeight: 500,
+                px: 2,
+                py: 0.5,
+                boxShadow: 'none',
+              }}
+              onClick={handleLogout}
+            >
+              Logout
+            </Button>
+          </Stack>
         )}
-      </p>
-        </div>
-      <div className="flex items-center justify-between gap-5">
-        <div>
-          <div className="flex items-center">
-            <FaMapMarkerAlt className="mr-2" />
-            <span id="city" className="font-semibold">{weather.city}</span>
-          </div>
-        </div>
-        <div className="flex items-center">
-          <div id="weather-icon" className="text-4xl mr-3">
+      </Box>
+
+      {/* Weather */}
+      <Stack
+        direction="row"
+        spacing={7}
+        sx={{
+          bgcolor: 'white',
+          borderRadius: 3,
+          px: 3,
+          py: 2,
+          boxShadow: 5,
+          minWidth: 220,
+        }}
+      >
+        <Box display="flex" alignItems="center">
+          <FaMapMarkerAlt style={{ marginRight: 10, color: 'grey', height: 20 }} />
+          <Typography variant="subtitle1" fontWeight={600} color="primary.main">
+            {weather.city}
+          </Typography>
+        </Box>
+        <Box display="flex" alignItems="center">
+          <Typography variant="h4" sx={{ mr: 1 }}>
             {weather.icon}
-          </div>
-          <div>
-            <div id="temperature" className="text-2xl font-bold">{weather.temperature}</div>
-            <div id="weather-description" className="text-xs capitalize">{weather.description}</div>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
+          </Typography>
+          <Box>
+            <Typography variant="h6" fontWeight={700} color="primary.main">
+              {weather.temperature}
+            </Typography>
+            <Typography variant="caption" color="text.secondary" sx={{ textTransform: 'capitalize' }}>
+              {weather.description}
+            </Typography>
+          </Box>
+        </Box>
+      </Stack>
+    </Stack>
+  </Paper>
+);
 
 export default Header;
